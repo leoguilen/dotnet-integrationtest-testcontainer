@@ -1,0 +1,72 @@
+version: '3'
+
+services:
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: ./Dockerfile
+      no_cache: true
+    container_name: postgres
+    hostname: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend-network
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wiremock:
+    build:
+      context: ./wiremock
+      dockerfile: ./Dockerfile
+      no_cache: true
+    container_name: wiremock
+    hostname: wiremock
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - backend-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:8080/__admin/health"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.8.3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - backend-network
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+networks:
+  backend-network:
+
+
+volumes:
+  postgres-data:

@@ -1,0 +1,31 @@
+{
+	"name": "Development Environment",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/base:jammy",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/dotnet:2": {}
+	},
+	"postAttachCommand": "sudo apt update -y",
+	"customizations": {
+		"codespaces": {},
+		"vscode": {
+			"settings": {
+				"editor.formatOnSave": true,
+				"editor.formatOnSaveMode": "file",
+				"editor.codeActionsOnSave": {
+					"source.fixAll": true,
+					"source.organizeImports": "always"
+				}
+			},
+			"extensions": [
+				"GitHub.copilot",
+				"ms-azuretools.vscode-docker",
+				"vscode-icons-team.vscode-icons",
+				"ms-dotnettools.csdevkit",
+				"EditorConfig.EditorConfig",
+				"humao.rest-client"
+			]
+		}
+	}
+}

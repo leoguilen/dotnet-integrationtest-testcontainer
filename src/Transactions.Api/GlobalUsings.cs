@@ -1,0 +1,17 @@
+﻿global using Transactions.Api.Models;
+global using Transactions.Api.Extensions;
+global using System.Net;
+global using System.Data;
+global using Dapper;
+global using Transactions.Api.Contracts.Requests;
+global using Transactions.Api.ExternalServices;
+global using Transactions.Api.Repositories;
+global using Microsoft.AspNetCore.Mvc;
+global using Transactions.Api.Services;
+global using Npgsql;
+global using Transactions.Api.Contracts.Responses;
+global using System.ComponentModel.DataAnnotations;
+global using System.Text;
+global using System.Text.Json;
+global using RabbitMQ.Client;
+global using Transactions.Api.Messaging;

@@ -1,0 +1,29 @@
+@BaseHostAddress = http://localhost:5117
+
+GET {{BaseHostAddress}}/api/v1/transactions/{{$guid}}
+Accept: application/json
+Connection: keep-alive
+
+###
+
+POST {{BaseHostAddress}}/api/v1/transactions
+Content-Type: application/json
+Connection: keep-alive
+
+{
+  "transactionId": "{{$guid}}",
+  "accountId": "{{$guid}}",
+  "amount": 10,
+  "currency": "BRL",
+  "transactionDate": "{{$datetime iso8601}}"
+}
+
+###
+
+POST {{BaseHostAddress}}/api/v1/transactions/{{$guid}}/undo
+Content-Type: application/json
+Connection: keep-alive
+
+{
+    "reason": "test"
+}
