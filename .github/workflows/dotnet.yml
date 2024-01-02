@@ -1,0 +1,42 @@
+name: Dotnet CI Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    
+    - name: Restore cached nuget packages
+      id: cache-nuget-packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore nuget packages
+      if: steps.cache-nuget-packages.outputs.cache-hit == false
+      run: dotnet restore --use-lock-file
+
+    - name: Build projects
+      run: dotnet build
+
+    - name: Run unit tests
+      run: dotnet test --no-build --filter "FullyQualifiedName!~IntegrationTest"
+
+    - name: Run integration tests
+      run: dotnet test --no-build --filter "FullyQualifiedName~IntegrationTest"
