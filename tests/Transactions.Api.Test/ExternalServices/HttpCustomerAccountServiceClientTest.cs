@@ -1,7 +1,7 @@
 ﻿namespace Transactions.Api.Test.ExternalServices;
 
-[Trait("UnitTest", nameof(HttpAccountServiceClient))]
-public class HttpAccountServiceClientTest
+[Trait("UnitTest", nameof(HttpCustomerAccountServiceClient))]
+public class HttpCustomerAccountServiceClientTest
 {
     [Fact]
     public void Test()

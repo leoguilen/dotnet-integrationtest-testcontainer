@@ -1,6 +1,6 @@
 ﻿namespace Transactions.Api.ExternalServices;
 
-public interface IAccountServiceClient
+public interface ICustomerAccountServiceClient
 {
     Task<Account?> FetchByIdAsync(Guid accountId, CancellationToken cancellationToken = default);
 }

@@ -1,6 +1,6 @@
 ﻿namespace Transactions.Api.Messaging;
 
-internal sealed class RabbitMqMessagePublisher(IConnection connection) : IPublisher
+internal sealed class RabbitMqMessagePublisher(IConnectionFactory connectionFactory) : IMessagePublisher
 {
     private const string QueueName = "transactions";
 
@@ -9,7 +9,9 @@ internal sealed class RabbitMqMessagePublisher(IConnection connection) : IPublis
         CancellationToken cancellationToken = default)
         where TMessage : class
     {
+        using var connection = connectionFactory.CreateConnection();
         using var channel = connection.CreateModel();
+
         channel.QueueDeclare(
             queue: QueueName,
             durable: false,

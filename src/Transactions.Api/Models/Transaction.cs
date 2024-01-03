@@ -13,17 +13,4 @@ public record Transaction
     public required DateTimeOffset Date { get; init; }
 
     public required Account Account { get; init; }
-
-    public Guid? ParentTransactionId { get; init; }
-
-    public string? Observation { get; init; }
-
-    public Transaction Undo(string? reason) => this with
-    {
-        Id = Guid.NewGuid(),
-        Amount = -Amount,
-        Date = DateTimeOffset.UtcNow,
-        ParentTransactionId = Id,
-        Observation = reason,
-    };
 }

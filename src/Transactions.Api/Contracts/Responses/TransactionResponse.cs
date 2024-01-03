@@ -5,14 +5,12 @@ public readonly record struct TransactionResponse(
     Guid AccountId,
     decimal Amount,
     string Currency,
-    DateTimeOffset TransactionDate,
-    string Status)
+    DateTimeOffset TransactionDate)
 {
     public static TransactionResponse From(Transaction transaction) => new(
         transaction.Id,
         transaction.AccountId,
         transaction.Amount,
         transaction.Currency,
-        transaction.Date,
-        transaction.ParentTransactionId.HasValue ? "Undone" : "Registered");
+        transaction.Date);
 }

@@ -1,9 +1,9 @@
 ﻿namespace Transactions.Api.ExternalServices;
 
-internal sealed class HttpAccountServiceClient(
+internal sealed class HttpCustomerAccountServiceClient(
     HttpClient client,
-    ILogger<HttpAccountServiceClient> logger)
-    : IAccountServiceClient
+    ILogger<HttpCustomerAccountServiceClient> logger)
+    : ICustomerAccountServiceClient
 {
     public async Task<Account?> FetchByIdAsync(
         Guid accountId,

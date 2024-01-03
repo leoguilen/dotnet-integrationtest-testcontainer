@@ -1,36 +1,12 @@
 ﻿namespace Transactions.Api.Services;
 
-internal sealed class TransactionService(
-    IAccountServiceClient accountServiceClient,
+internal sealed class TransactionProcessingService(
+    ICustomerAccountServiceClient accountServiceClient,
     ITransactionRepository transactionRepository,
-    IPublisher publisher)
-    : ITransactionService
+    IMessagePublisher publisher)
+    : ITransactionProcessingService
 {
-    public async Task<IResult> GetAsync(
-        Guid transactionId,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var transaction = await transactionRepository
-                .GetByIdAsync(transactionId, cancellationToken);
-
-            return transaction is null
-                ? Results.NotFound()
-                : Results.Ok(TransactionResponse.From(transaction));
-        }
-        catch (Exception ex)
-        {
-            return Results.Problem(
-                detail: ex.Message,
-                instance: $"urn:transactions:get:{transactionId}",
-                statusCode: StatusCodes.Status500InternalServerError,
-                title: "An error occurred while getting the transaction.",
-                type: "https://httpstatuses.com/500");
-        }
-    }
-
-    public async Task<IResult> RegisterAsync(
+    public async Task<IResult> ExecuteAsync(
         TransactionRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -91,7 +67,7 @@ internal sealed class TransactionService(
             await publisher.PublishAsync(registeredTransaction!, cancellationToken);
 
             return Results.Created(
-                uri: $"/api/v1/transactions/{registeredTransaction!.Id}",
+                uri: $"/api/transactions/{registeredTransaction!.Id}",
                 value: null);
         }
         catch (Exception ex)
@@ -101,42 +77,6 @@ internal sealed class TransactionService(
                 instance: $"urn:transactions:register:{request.TransactionId}",
                 statusCode: StatusCodes.Status500InternalServerError,
                 title: "An error occurred while registering the transaction.",
-                type: "https://httpstatuses.com/500");
-        }
-    }
-
-    public async Task<IResult> UndoAsync(
-        Guid transactionId,
-        UndoTransactionRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var transaction = await transactionRepository
-                .GetByIdAsync(transactionId, cancellationToken);
-            if (transaction is null)
-            {
-                return Results.NotFound();
-            }
-
-            var transactionUndone = transaction.Undo(request.Reason);
-
-            var registeredTransaction = await transactionRepository
-                .AddAsync(transactionUndone, cancellationToken);
-
-            await publisher.PublishAsync(registeredTransaction!, cancellationToken);
-
-            return Results.Created(
-                uri: $"/api/v1/transactions/{registeredTransaction!.Id}",
-                value: null);
-        }
-        catch (Exception ex)
-        {
-            return Results.Problem(
-                detail: ex.Message,
-                instance: $"urn:transactions:undo:{transactionId}",
-                statusCode: StatusCodes.Status500InternalServerError,
-                title: "An error occurred while undoing the transaction.",
                 type: "https://httpstatuses.com/500");
         }
     }

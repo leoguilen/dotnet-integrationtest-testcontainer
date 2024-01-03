@@ -9,7 +9,6 @@ public class CustomWebApplicationFactory
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Test");
         builder.ConfigureAppConfiguration((context, config) => config
             .AddInMemoryCollection([
                 new KeyValuePair<string, string?>("ConnectionStrings:Database", _containersFixture.PostgreSqlContainer.GetConnectionString()),
@@ -23,5 +22,5 @@ public class CustomWebApplicationFactory
     async Task IAsyncLifetime.DisposeAsync() => await _containersFixture.DisposeAsync();
 }
 
-[CollectionDefinition(nameof(WebApplicationFactoryCollection))]
-public class WebApplicationFactoryCollection : ICollectionFixture<CustomWebApplicationFactory>;
+[CollectionDefinition(nameof(CustomWebApplicationFactoryCollection))]
+public class CustomWebApplicationFactoryCollection : ICollectionFixture<CustomWebApplicationFactory>;

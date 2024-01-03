@@ -1,46 +1,24 @@
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddHttpClient<IAccountServiceClient, HttpAccountServiceClient>(client =>
-{
-    var accountApiConfig = builder.Configuration.GetRequiredSection("AccountApi");
-
-    client.BaseAddress = accountApiConfig.GetValue<Uri>("BaseUrl");
-    client.Timeout = accountApiConfig.GetValue<TimeSpan>("Timeout");
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-    client.DefaultRequestHeaders.Add("User-Agent", "Transactions.Api/1.0");
-    client.DefaultRequestHeaders.Add("Connection", "Keep-Alive");
-});
-builder.Services.AddScoped<IDbConnection>(_ => new NpgsqlConnection(builder.Configuration.GetConnectionString("Database")));
-builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
-builder.Services.AddScoped<ITransactionService, TransactionService>();
-builder.Services.AddScoped(_ =>
-{
-    var rabbitMqConnectionString = builder.Configuration.GetConnectionString("RabbitMq");
-
-    var factory = new ConnectionFactory
-    {
-        Uri = new Uri(rabbitMqConnectionString!),
-    };
-
-    return factory.CreateConnection();
-});
-builder.Services.AddScoped<IPublisher, RabbitMqMessagePublisher>();
+builder.Services.AddExternalServicesHttpClients(builder.Configuration);
+builder.Services.AddMessagingServices(builder.Configuration);
+builder.Services.AddDataRepositories(builder.Configuration);
+builder.Services.AddScoped<ITransactionProcessingService, TransactionProcessingService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+var api = app.MapGroup("/api");
 
-app.UseHttpsRedirection();
-
-var v1 = app.MapGroup("/api/v1");
-
-v1.MapTransactionEndpoints();
+api.MapPost(
+    pattern: "/transactions",
+    handler: async (
+        [FromBody] TransactionRequest request,
+        [FromServices] ITransactionProcessingService processingService,
+        CancellationToken requestAborted)
+        => await processingService.ExecuteAsync(request, requestAborted))
+.WithName("RegisterTransaction")
+.WithTags("Transactions")
+.WithOpenApi();
 
 await app
     .RunAsync()

@@ -9,16 +9,14 @@ internal sealed class TransactionRepository(IDbConnection dbConnection) : ITrans
         var command = new CommandDefinition(
             commandText:
             """
-            INSERT INTO "TRANSACTIONS" ("ID", "ACCOUNT_ID", "AMOUNT", "CURRENCY", "DATE", "PARENT_TRANSACTION_ID", "OBSERVATION")
-            VALUES (@Id, @AccountId, @Amount, @Currency, @Date, @ParentTransactionId, @Observation)
+            INSERT INTO "TRANSACTIONS" ("ID", "ACCOUNT_ID", "AMOUNT", "CURRENCY", "DATE")
+            VALUES (@Id, @AccountId, @Amount, @Currency, @Date)
             RETURNING
                 "ID" AS "Id",
                 "ACCOUNT_ID" AS "AccountId",
                 "AMOUNT" AS "Amount",
                 "CURRENCY" AS "Currency",
-                "DATE" AS "Date",
-                "PARENT_TRANSACTION_ID" AS "ParentTransactionId",
-                "OBSERVATION" AS "Observation";
+                "DATE" AS "Date";
             """,
             parameters: transaction,
             commandType: CommandType.Text,
@@ -41,9 +39,7 @@ internal sealed class TransactionRepository(IDbConnection dbConnection) : ITrans
                 "ACCOUNT_ID" AS "AccountId",
                 "AMOUNT" AS "Amount",
                 "CURRENCY" AS "Currency",
-                "DATE" AS "Date",
-                "PARENT_TRANSACTION_ID" AS "ParentTransactionId",
-                "OBSERVATION" AS "Observation"
+                "DATE" AS "Date"
             FROM "TRANSACTIONS"
             WHERE "ID" = @TransactionId;
             """,

@@ -1,7 +1,7 @@
 ﻿namespace Transactions.Api.Test.Services;
 
-[Trait("UnitTest", nameof(TransactionService))]
-public class TransactionServiceTest
+[Trait("UnitTest", nameof(TransactionProcessingService))]
+public class TransactionProcessingServiceTest
 {
     [Fact]
     public void Test()
